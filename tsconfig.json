@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@mythicforge/shared": ["./packages/shared/src/index.ts"],
+      "@mythicforge/plugin-api": ["./packages/plugin-api/src/index.ts"],
+      "@mythicforge/dice-engine": ["./packages/dice-engine/src/index.ts"],
+      "@mythicforge/network": ["./packages/network/src/index.ts"],
+      "@mythicforge/ui": ["./packages/ui-components/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "**/dist/**", "**/build/**"]
+}

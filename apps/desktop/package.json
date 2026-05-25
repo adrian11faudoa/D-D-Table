@@ -1,0 +1,103 @@
+{
+  "name": "@mythicforge/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MythicForge VTT Desktop Application",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "concurrently \"electron-vite dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "electron-vite build",
+    "package:win": "npm run build && electron-builder --win",
+    "package:mac": "npm run build && electron-builder --mac",
+    "package:linux": "npm run build && electron-builder --linux",
+    "package:all": "npm run build && electron-builder --win --mac --linux"
+  },
+  "dependencies": {
+    "@mythicforge/server": "*",
+    "electron-updater": "^6.1.7"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.9.1",
+    "electron-vite": "^2.2.0",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0",
+    "typescript": "^5.4.0"
+  },
+  "build": {
+    "appId": "io.mythicforge.vtt",
+    "productName": "MythicForge VTT",
+    "copyright": "Copyright © 2025 MythicForge",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**",
+      "assets/**",
+      "!**/*.map"
+    ],
+    "extraResources": [
+      { "from": "../server/dist", "to": "server", "filter": ["**/*"] },
+      { "from": "../../node_modules", "to": "node_modules", "filter": ["**/*.node"] }
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64", "ia32"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.ico",
+      "publisherName": "MythicForge"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MythicForge VTT"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.games",
+      "hardenedRuntime": true,
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist"
+    },
+    "dmg": {
+      "title": "MythicForge VTT ${version}",
+      "icon": "assets/icon.icns",
+      "contents": [
+        { "x": 410, "y": 150, "type": "link", "path": "/Applications" },
+        { "x": 130, "y": 150, "type": "file" }
+      ]
+    },
+    "linux": {
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] },
+        { "target": "rpm", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Game",
+      "description": "MythicForge Virtual Tabletop",
+      "desktop": {
+        "Name": "MythicForge VTT",
+        "Comment": "Virtual Tabletop for RPGs",
+        "Categories": "Game;Entertainment"
+      }
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "mythicforge",
+      "repo": "vtt"
+    }
+  }
+}

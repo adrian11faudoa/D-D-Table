@@ -1,0 +1,36 @@
+{
+  "name": "mythicforge-vtt",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MythicForge VTT — A professional virtual tabletop platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "plugins/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "build:desktop": "turbo run build --filter=@mythicforge/desktop",
+    "start:server": "turbo run start --filter=@mythicforge/server",
+    "package:win": "turbo run package:win --filter=@mythicforge/desktop",
+    "package:mac": "turbo run package:mac --filter=@mythicforge/desktop",
+    "package:linux": "turbo run package:linux --filter=@mythicforge/desktop",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^1.13.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

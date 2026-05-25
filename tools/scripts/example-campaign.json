@@ -1,0 +1,302 @@
+{
+  "campaign": {
+    "id": "campaign-tomb-of-annihilation",
+    "name": "Tomb of Annihilation",
+    "description": "The death curse has spread across the land. Resurrection magic fails, and those who have been brought back from death are slowly wasting away. The adventurers must travel to the far jungle continent of Chult to find the source of this curse — a necromantic artifact known as the Soulmonger — hidden deep within the Tomb of the Nine Gods.",
+    "gameSystemId": "dnd5e",
+    "coverImageUrl": "/assets/campaigns/tomb-of-annihilation/cover.webp",
+    "settings": {
+      "worldTime": 1209600,
+      "experience": "milestone",
+      "calendar": {
+        "daysPerWeek": 10,
+        "monthsPerYear": 12,
+        "daysPerMonth": [30, 28, 30, 30, 29, 30, 28, 30, 30, 31, 30, 29],
+        "weekdayNames": ["Sul", "Mol", "Zol", "Wir", "Zor", "Far", "Sar", "Nym", "Dra", "Dar"],
+        "monthNames": ["Hammer", "Alturiak", "Ches", "Tarsakh", "Mirtul", "Kythorn", "Flamerule", "Eleasis", "Eleint", "Marpenoth", "Uktar", "Nightal"]
+      }
+    }
+  },
+
+  "scenes": [
+    {
+      "id": "scene-omu-ruins",
+      "name": "Omu — The Ruins",
+      "backgroundImageUrl": "/assets/scenes/omu-ruins.webp",
+      "width": 4000,
+      "height": 3000,
+      "grid": {
+        "type": "square",
+        "size": 100,
+        "scale": "5 ft",
+        "color": "#c9a84c",
+        "alpha": 0.3,
+        "offsetX": 0,
+        "offsetY": 0,
+        "snap": true
+      },
+      "globalLightLevel": 0.6,
+      "darknessLevel": 0.4,
+      "tokenVision": true,
+      "weather": { "type": "rain", "intensity": 0.4 },
+      "ambient": { "volume": 0.6 }
+    },
+    {
+      "id": "scene-tomb-chamber-3",
+      "name": "Tomb — Chamber 3",
+      "backgroundImageUrl": "/assets/scenes/tomb-chamber-3.webp",
+      "width": 3000,
+      "height": 2000,
+      "grid": {
+        "type": "square",
+        "size": 100,
+        "scale": "5 ft",
+        "color": "#8890a8",
+        "alpha": 0.2,
+        "offsetX": 0,
+        "offsetY": 0,
+        "snap": true
+      },
+      "globalLightLevel": 0.0,
+      "darknessLevel": 0.95,
+      "tokenVision": true,
+      "weather": { "type": "none", "intensity": 0 }
+    }
+  ],
+
+  "actors": [
+    {
+      "id": "actor-aldric-stormveil",
+      "type": "character",
+      "name": "Aldric Stormveil",
+      "img": "/assets/tokens/wizard-elf.webp",
+      "data": {
+        "abilities": {
+          "str": { "value": 8, "proficient": 0 },
+          "dex": { "value": 14, "proficient": 0 },
+          "con": { "value": 13, "proficient": 1 },
+          "int": { "value": 20, "proficient": 1 },
+          "wis": { "value": 14, "proficient": 0 },
+          "cha": { "value": 10, "proficient": 0 }
+        },
+        "attributes": {
+          "hp": { "value": 32, "min": 0, "max": 45, "temp": 0, "tempmax": 0 },
+          "ac": { "value": 14, "calc": "mage-armor" },
+          "init": { "value": 2, "bonus": 0 },
+          "speed": { "value": 35, "burrow": 0, "climb": 0, "fly": 0, "swim": 0, "hover": false },
+          "prof": 3,
+          "spellcasting": "int",
+          "spelldc": 16,
+          "movement": { "units": "ft" },
+          "exhaustion": 0,
+          "concentration": { "active": true },
+          "death": { "success": 0, "failure": 0 }
+        },
+        "details": {
+          "biography": {
+            "value": "<p>Aldric Stormveil is a wood elf wizard who spent decades studying at the Arcane Brotherhood in Luskan. He specializes in divination magic and seeks to understand the workings of fate itself.</p><p>After several of his resurrected friends began wasting away from the death curse, he joined the expedition to Chult to find a cure.</p>",
+            "public": "<p>A serious, scholarly wood elf with silver hair and eyes that seem to see beyond the present moment.</p>"
+          },
+          "alignment": "Lawful Neutral",
+          "race": "Wood Elf",
+          "background": "Sage",
+          "originalClass": "Divination Wizard",
+          "xp": { "value": 21500, "min": 14000, "max": 23000 },
+          "age": "147",
+          "height": "5'8\"",
+          "weight": "145 lbs",
+          "eyes": "Silver",
+          "hair": "White",
+          "ideal": "Knowledge is the greatest treasure.",
+          "bond": "I have an ancient tome of prophecy that I must decipher.",
+          "flaw": "I become obsessed with problems and ignore everything else.",
+          "trait": "I use many-syllabled words that convey the appearance of great erudition."
+        },
+        "skills": {
+          "arc": { "value": 1, "ability": "int" },
+          "his": { "value": 1, "ability": "int" },
+          "inv": { "value": 1, "ability": "int" },
+          "nat": { "value": 0.5, "ability": "int" },
+          "prc": { "value": 1, "ability": "wis" }
+        },
+        "traits": {
+          "size": "med",
+          "di": [],
+          "dr": [],
+          "dv": [],
+          "ci": [],
+          "languages": { "value": ["common", "elvish", "draconic", "deep-speech", "primordial"], "custom": "" },
+          "senses": { "darkvision": 60, "blindsight": 0, "tremorsense": 0, "truesight": 0, "units": "ft", "special": "Trance (elven meditation)" },
+          "weaponProf": { "value": ["simpleW", "longsword", "shortsword", "longbow", "shortbow"], "custom": "" },
+          "armorProf": { "value": [], "custom": "" }
+        },
+        "currency": { "cp": 0, "sp": 45, "ep": 0, "gp": 127, "pp": 3 },
+        "resources": {
+          "primary": { "label": "Portent Dice", "value": 1, "max": 2, "sr": false, "lr": true },
+          "secondary": { "label": "", "value": 0, "max": 0, "sr": false, "lr": false },
+          "tertiary": { "label": "", "value": 0, "max": 0, "sr": false, "lr": false }
+        },
+        "spells": {
+          "spell1": { "value": 3, "max": 4, "override": null },
+          "spell2": { "value": 2, "max": 3, "override": null },
+          "spell3": { "value": 2, "max": 3, "override": null },
+          "spell4": { "value": 1, "max": 1, "override": null },
+          "spell5": { "value": 0, "max": 0, "override": null },
+          "spell6": { "value": 0, "max": 0, "override": null },
+          "spell7": { "value": 0, "max": 0, "override": null },
+          "spell8": { "value": 0, "max": 0, "override": null },
+          "spell9": { "value": 0, "max": 0, "override": null },
+          "pact": { "value": 0, "max": 0, "override": null }
+        },
+        "bonuses": {
+          "mwak": { "attack": "", "damage": "" },
+          "rwak": { "attack": "", "damage": "" },
+          "msak": { "attack": "", "damage": "" },
+          "rsak": { "attack": "", "damage": "" },
+          "abilities": { "check": "", "save": "", "skill": "" },
+          "spell": { "dc": "" }
+        }
+      },
+      "ownership": {}
+    },
+    {
+      "id": "actor-omu-guardian",
+      "type": "npc",
+      "name": "Omu Guardian",
+      "img": "/assets/tokens/construct-guardian.webp",
+      "data": {
+        "abilities": {
+          "str": { "value": 22, "proficient": 0 },
+          "dex": { "value": 8, "proficient": 0 },
+          "con": { "value": 20, "proficient": 1 },
+          "int": { "value": 3, "proficient": 0 },
+          "wis": { "value": 11, "proficient": 0 },
+          "cha": { "value": 1, "proficient": 0 }
+        },
+        "attributes": {
+          "hp": { "value": 110, "min": 0, "max": 136, "temp": 0, "tempmax": 0 },
+          "ac": { "value": 17, "calc": "natural" },
+          "init": { "value": -1, "bonus": 0 },
+          "speed": { "value": 30, "burrow": 0, "climb": 0, "fly": 0, "swim": 0, "hover": false },
+          "prof": 3,
+          "spellcasting": "",
+          "spelldc": 10,
+          "movement": { "units": "ft" },
+          "exhaustion": 0,
+          "concentration": { "active": false },
+          "death": { "success": 0, "failure": 0 }
+        },
+        "details": {
+          "biography": { "value": "<p>An ancient stone construct created by the trickster gods to guard the Tomb of the Nine Gods. It cannot be reasoned with and will attack until destroyed or its target is defeated.</p>", "public": "" },
+          "alignment": "Unaligned",
+          "race": "Construct",
+          "background": "",
+          "originalClass": "",
+          "xp": { "value": 5000, "min": 0, "max": 5000 },
+          "cr": 9,
+          "type": { "value": "construct", "subtype": "", "swarm": "" },
+          "environment": "Tomb",
+          "source": "Tomb of Annihilation p.128"
+        },
+        "traits": {
+          "size": "lg",
+          "di": ["poison", "psychic"],
+          "dr": ["bludgeoning", "piercing", "slashing"],
+          "dv": [],
+          "ci": ["charmed", "exhaustion", "frightened", "paralyzed", "petrified", "poisoned"],
+          "languages": { "value": [], "custom": "understands all languages but can't speak" },
+          "senses": { "darkvision": 120, "blindsight": 0, "tremorsense": 0, "truesight": 0, "units": "ft", "special": "" }
+        }
+      },
+      "ownership": {}
+    }
+  ],
+
+  "items": [
+    {
+      "actorId": "actor-aldric-stormveil",
+      "id": "item-fireball",
+      "type": "spell",
+      "name": "Fireball",
+      "img": "/assets/icons/spells/fireball.webp",
+      "data": {
+        "level": 3,
+        "school": "evo",
+        "components": { "vocal": true, "somatic": true, "material": true, "value": "a tiny ball of bat guano and sulfur" },
+        "activation": { "type": "action", "cost": 1 },
+        "duration": { "value": "instantaneous", "units": "inst" },
+        "range": { "value": 150, "long": null, "units": "ft" },
+        "target": { "value": 20, "units": "ft", "type": "sphere" },
+        "damage": { "parts": [["8d6", "fire"]], "versatile": "" },
+        "save": { "ability": "dex", "dc": null, "scaling": "spell" },
+        "description": { "value": "<p>A bright streak flashes from your pointing finger to a point you choose within range and then blossoms with a low roar into an explosion of flame. Each creature in a 20-foot-radius sphere centered on that point must make a Dexterity saving throw. A target takes 8d6 fire damage on a failed save, or half as much on a successful one.</p>" }
+      }
+    },
+    {
+      "actorId": "actor-aldric-stormveil",
+      "id": "item-staff-of-power",
+      "type": "weapon",
+      "name": "Staff of Power",
+      "img": "/assets/icons/weapons/staff.webp",
+      "data": {
+        "quantity": 1,
+        "weight": 4,
+        "price": 0,
+        "rarity": "very rare",
+        "equipped": true,
+        "attunement": "required",
+        "description": { "value": "<p>This staff can be wielded as a magic quarterstaff that grants a +2 bonus to attack and damage rolls made with it. While holding it, you gain a +2 bonus to Armor Class, saving throws, and spell attack rolls.</p>" },
+        "activation": { "type": "action", "cost": 1 },
+        "actionType": "mwak",
+        "damage": { "parts": [["1d6+2", "bludgeoning"]], "versatile": "1d8+2" },
+        "range": { "value": null, "long": null, "units": "ft" },
+        "properties": { "thr": false, "fin": false, "ver": true, "two": false }
+      }
+    }
+  ],
+
+  "journal": [
+    {
+      "id": "journal-session-12",
+      "name": "Session 12 Notes",
+      "content": "<h2>Session 12 — The Tomb Awaits</h2><p><strong>Date:</strong> Tarsakh 14</p><h3>Summary</h3><p>The party descended into the Tomb of the Nine Gods after spending two days mapping the exterior and neutralizing the guardian statues at the entrance.</p><h3>Key Events</h3><ul><li>Discovered the first puzzle chamber — the Scale of Moa</li><li>Kira successfully disarmed the poison dart trap (DC 22 thieves' tools)</li><li>Aldric's Detect Magic revealed three magical auras in the altar chamber</li><li>Omu Guardian combat — party spent significant resources</li></ul><h3>Treasure Found</h3><ul><li>Gold serpent idol (500 gp)</li><li>Scroll of Protection from Evil and Good</li><li>12 pp hidden in a secret compartment</li></ul><h3>Notes for Next Session</h3><p>Party is camping in the antechamber. They have 4 spell slots remaining between them. The north door requires a puzzle to open — foreshadow this.</p>",
+      "ownership": {}
+    },
+    {
+      "id": "journal-omu-lore",
+      "name": "The City of Omu — Lore",
+      "content": "<h2>Omu — The Forbidden City</h2><p>Once the greatest city in all of Chult, Omu was destroyed by the trickster gods after its people turned from worshipping them. The city now lies in a remote valley surrounded by cliffs, accessible only through treacherous jungle paths.</p><h3>The Nine Trickster Gods</h3><ul><li><strong>Eshowdow</strong> — God of shadows</li><li><strong>I'Jin</strong> — Goddess of whims</li><li><strong>Kubazan</strong> — God of boldness</li><li><strong>Moa</strong> — God of honesty</li><li><strong>Nangnang</strong> — Goddess of greed</li><li><strong>Obo'laka</strong> — Goddess of caution</li><li><strong>Papazotl</strong> — God of cunning</li><li><strong>Shagambi</strong> — Goddess of valor</li><li><strong>Wongo</strong> — God of disharmony</li></ul><h3>The Death Curse</h3><p>The Soulmonger, a powerful necromantic artifact, is draining the life force of everyone who has ever been resurrected. It must be destroyed.</p>",
+      "ownership": {}
+    }
+  ],
+
+  "playlists": [
+    {
+      "id": "playlist-dungeon-ambient",
+      "name": "Dungeon Ambience",
+      "description": "Dark atmospheric music for dungeon exploration",
+      "mode": "sequential",
+      "playing": true,
+      "volume": 0.4,
+      "fade": 3000,
+      "sounds": [
+        { "id": "sound-dungeon-1", "name": "Dungeon Depths", "src": "/assets/audio/dungeon-ambient-01.mp3", "volume": 1.0, "repeat": true, "playing": true },
+        { "id": "sound-dungeon-2", "name": "Ancient Halls", "src": "/assets/audio/dungeon-ambient-02.mp3", "volume": 0.9, "repeat": true, "playing": false },
+        { "id": "sound-dungeon-3", "name": "The Tomb", "src": "/assets/audio/dungeon-ambient-03.mp3", "volume": 0.95, "repeat": true, "playing": false }
+      ]
+    },
+    {
+      "id": "playlist-combat",
+      "name": "Combat — Epic Battles",
+      "description": "High-energy combat music",
+      "mode": "shuffle",
+      "playing": false,
+      "volume": 0.6,
+      "fade": 1000,
+      "sounds": [
+        { "id": "sound-combat-1", "name": "Battle Fury", "src": "/assets/audio/combat-01.mp3", "volume": 1.0, "repeat": false, "playing": false },
+        { "id": "sound-combat-2", "name": "The Fight", "src": "/assets/audio/combat-02.mp3", "volume": 0.9, "repeat": false, "playing": false }
+      ]
+    }
+  ]
+}

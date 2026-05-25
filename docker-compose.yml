@@ -1,0 +1,63 @@
+# ============================================================
+# MythicForge VTT — Docker Compose (Development)
+# ============================================================
+version: '3.9'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=file:/data/mythicforge.db
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-in-prod}
+      - ASSETS_DIR=/data/assets
+      - UPLOADS_DIR=/data/uploads
+    volumes:
+      - mythicforge-data:/data
+      - ./apps/server/src:/app/apps/server/src:ro
+      - ./packages:/app/packages:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  client:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.client
+      args:
+        - VITE_API_URL=http://localhost:3000
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./apps/client/src:/app/apps/client/src:ro
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Optional: PostgreSQL for production
+  # postgres:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_DB: mythicforge
+  #     POSTGRES_USER: mythicforge
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+volumes:
+  mythicforge-data:
+  # postgres-data:
