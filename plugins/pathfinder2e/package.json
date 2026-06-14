@@ -1,0 +1,17 @@
+{
+  "name": "@mythicforge-plugin/pathfinder2e",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "peerDependencies": {
+    "@mythicforge/shared": "*",
+    "@mythicforge/plugin-api": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

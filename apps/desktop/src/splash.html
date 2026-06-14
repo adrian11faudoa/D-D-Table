@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Georgia', serif;
+      user-select: none;
+      overflow: hidden;
+    }
+    .container {
+      background: rgba(10, 11, 14, 0.97);
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      border-radius: 12px;
+      padding: 40px 50px;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Corner decorations */
+    .container::before, .container::after {
+      content: '✦';
+      position: absolute;
+      color: rgba(201, 168, 76, 0.3);
+      font-size: 18px;
+    }
+    .container::before { top: 16px; left: 16px; }
+    .container::after  { bottom: 16px; right: 16px; }
+
+    .icon { font-size: 56px; margin-bottom: 16px; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .7; } }
+
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #c9a84c;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: #555e78;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    .status {
+      font-size: 12px;
+      color: #8890a8;
+      margin-bottom: 16px;
+      min-height: 18px;
+      font-style: italic;
+    }
+    .progress-bar {
+      width: 200px;
+      height: 2px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 1px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #a07830, #c9a84c, #a07830);
+      background-size: 200% 100%;
+      border-radius: 1px;
+      animation: shimmer 1.5s linear infinite, grow 3s ease-out forwards;
+    }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes grow    { 0% { width: 0%; } 90% { width: 90%; } 100% { width: 100%; } }
+
+    .version {
+      font-size: 10px;
+      color: #363d52;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">⚔</div>
+    <div class="title">MythicForge</div>
+    <div class="subtitle">Virtual Tabletop</div>
+    <div class="status" id="status">Initializing server...</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="version">v0.1.0</div>
+  </div>
+
+  <script>
+    const statuses = [
+      'Initializing server...',
+      'Connecting to database...',
+      'Loading game systems...',
+      'Preparing assets...',
+      'Opening the portal...',
+    ];
+    let i = 0;
+    const el = document.getElementById('status');
+    const interval = setInterval(() => {
+      i++;
+      if (i < statuses.length) {
+        el.textContent = statuses[i];
+      } else {
+        clearInterval(interval);
+        el.textContent = 'Ready!';
+      }
+    }, 600);
+  </script>
+</body>
+</html>

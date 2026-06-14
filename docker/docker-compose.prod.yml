@@ -1,0 +1,95 @@
+version: '3.9'
+
+# ============================================================
+# MythicForge VTT — Docker Compose (AWS-Compatible)
+# Mirrors the AWS ECS/RDS/EFS setup for local testing
+# ============================================================
+
+services:
+  # ── Game Server ────────────────────────────────────────────
+  server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.aws
+    image: mythicforge-vtt:latest
+    container_name: mythicforge-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL:-file:/data/mythicforge.db}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      ASSETS_DIR: /data/assets
+      UPLOADS_DIR: /data/uploads
+      PLUGINS_DIR: /data/plugins
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
+      # AWS-specific (set in real deployment)
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      S3_BUCKET: ${S3_BUCKET:-}
+      REDIS_URL: ${REDIS_URL:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - mythicforge-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - mythicforge-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Nginx Reverse Proxy ────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: mythicforge-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - mythicforge-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  # ── Redis (Session cache, pub/sub for multi-instance) ──────
+  redis:
+    image: redis:7-alpine
+    container_name: mythicforge-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-mythicforge-redis}
+    volumes:
+      - redis-data:/data
+    networks:
+      - mythicforge-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  mythicforge-data:
+  redis-data:
+  nginx-cache:
+
+networks:
+  mythicforge-net:
+    driver: bridge

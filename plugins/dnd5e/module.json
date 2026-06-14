@@ -1,0 +1,31 @@
+{
+  "id": "dnd5e",
+  "title": "Dungeons & Dragons 5th Edition",
+  "description": "The official D&D 5e game system for MythicForge VTT. Includes full character automation, spell management, combat tracking, and SRD compendium.",
+  "version": "1.0.0",
+  "author": "MythicForge Team",
+  "homepage": "https://mythicforge.io/systems/dnd5e",
+  "license": "MIT",
+  "compatibility": {
+    "minimum": "0.1.0",
+    "verified": "0.1.0"
+  },
+  "esmodules": ["dist/index.js"],
+  "styles": ["dist/dnd5e.css"],
+  "languages": [
+    { "lang": "en", "name": "English", "path": "lang/en.json" }
+  ],
+  "packs": [
+    { "id": "dnd5e.monsters",  "name": "monsters",  "label": "SRD Monsters",  "type": "Actor",       "path": "packs/monsters.db"  },
+    { "id": "dnd5e.spells",    "name": "spells",    "label": "SRD Spells",    "type": "Item",        "path": "packs/spells.db"    },
+    { "id": "dnd5e.items",     "name": "items",     "label": "SRD Items",     "type": "Item",        "path": "packs/items.db"     },
+    { "id": "dnd5e.classes",   "name": "classes",   "label": "SRD Classes",   "type": "Item",        "path": "packs/classes.db"   },
+    { "id": "dnd5e.feats",     "name": "feats",     "label": "SRD Feats",     "type": "Item",        "path": "packs/feats.db"     },
+    { "id": "dnd5e.rules",     "name": "rules",     "label": "SRD Rules",     "type": "JournalEntry","path": "packs/rules.db"     }
+  ],
+  "type": "system",
+  "media": [
+    { "type": "icon",       "url": "assets/icon.webp" },
+    { "type": "background", "url": "assets/splash.webp" }
+  ]
+}

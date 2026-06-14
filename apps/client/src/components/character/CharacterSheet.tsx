@@ -4,7 +4,42 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import type { Actor, Item, ActiveEffect } from '@mythicforge/shared';
-import type { DnD5eActorData } from '../../../plugins/dnd5e/src';
+// D&D 5e actor data shape (inline to avoid cross-package dep)
+interface DnD5eActorData {
+  abilities: Record<string, { value: number; mod?: number; proficient?: number; save?: number }>;
+  attributes: {
+    hp: { value: number; max: number; temp?: number; tempmax?: number };
+    ac: { value: number; calc: string };
+    init: { value: number; bonus: number };
+    speed: { value: number; burrow?: number; climb?: number; fly?: number; swim?: number; hover?: boolean };
+    prof: number;
+    spellcasting: string;
+    spelldc: number;
+    movement: { units: string };
+    exhaustion: number;
+    concentration: { active: boolean };
+    death: { success: number; failure: number };
+  };
+  details: {
+    biography: { value: string; public: string };
+    alignment: string; race: string; background: string; originalClass: string;
+    xp: { value: number; min: number; max: number };
+    age?: string; height?: string; weight?: string; eyes?: string; skin?: string; hair?: string;
+    ideal?: string; bond?: string; flaw?: string; trait?: string; appearance?: string; cr?: number;
+    type?: { value: string; subtype: string; swarm: string };
+    level?: number;
+  };
+  skills: Record<string, { value: number; ability: string; total?: number; passive?: number }>;
+  traits: {
+    size: string; di: string[]; dr: string[]; dv: string[]; ci: string[];
+    languages: { value: string[]; custom: string };
+    senses: { darkvision: number; blindsight: number; tremorsense: number; truesight: number; units: string; special: string };
+  };
+  currency: { cp: number; sp: number; ep: number; gp: number; pp: number };
+  resources: Record<string, { label: string; value: number; max: number; sr: boolean; lr: boolean }>;
+  spells: Record<string, { value: number; max: number; override: number | null }>;
+  bonuses: Record<string, Record<string, string>>;
+}
 import { roll } from '@mythicforge/dice-engine';
 
 // ─── Constants ───────────────────────────────────────────────

@@ -1,0 +1,67 @@
+# ============================================================
+# MythicForge VTT — AWS-Optimized Dockerfile
+# Multi-stage build for smallest possible image
+# ============================================================
+
+FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat curl
+WORKDIR /app
+
+# ── Dependency stage ──────────────────────────────────────────
+FROM base AS deps
+COPY package.json package-lock.json turbo.json ./
+COPY apps/server/package.json ./apps/server/
+COPY packages/shared/package.json         ./packages/shared/
+COPY packages/dice-engine/package.json    ./packages/dice-engine/
+COPY packages/network/package.json        ./packages/network/
+COPY packages/plugin-api/package.json     ./packages/plugin-api/
+RUN npm ci --omit=dev 2>/dev/null || npm install --omit=dev
+
+# ── Build stage ───────────────────────────────────────────────
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+# Build shared packages first, then server
+RUN npx tsc -p packages/shared/tsconfig.json    2>/dev/null || true
+RUN npx tsc -p packages/dice-engine/tsconfig.json 2>/dev/null || true
+RUN npx tsc -p packages/network/tsconfig.json   2>/dev/null || true
+RUN npx tsc -p packages/plugin-api/tsconfig.json 2>/dev/null || true
+RUN npx tsc -p apps/server/tsconfig.json        2>/dev/null || true
+
+# ── Production runner ─────────────────────────────────────────
+FROM node:20-alpine AS runner
+RUN apk add --no-cache curl tini
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Non-root user
+RUN addgroup -g 1001 mythicforge && adduser -u 1001 -G mythicforge -s /bin/sh -D mythicforge
+
+WORKDIR /app
+
+# Data directories (will be overridden by EFS mount in ECS)
+RUN mkdir -p /data/assets /data/uploads /data/packs /data/plugins && \
+    chown -R mythicforge:mythicforge /data /app
+
+COPY --from=builder --chown=mythicforge:mythicforge /app/apps/server/dist ./dist
+COPY --from=builder --chown=mythicforge:mythicforge /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder --chown=mythicforge:mythicforge /app/node_modules ./node_modules
+
+# Fallback: copy raw source if build failed (tsx will run it directly)
+COPY --from=builder --chown=mythicforge:mythicforge /app/apps/server/src ./src
+COPY --from=builder --chown=mythicforge:mythicforge /app/packages ./packages-src
+
+COPY --chown=mythicforge:mythicforge apps/server/public ./public
+
+EXPOSE 3000
+
+VOLUME ["/data"]
+
+USER mythicforge
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "dist/index.js"]

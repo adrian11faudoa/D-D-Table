@@ -1,0 +1,29 @@
+# ============================================================
+# production.tfvars — Copy this file and fill in your values
+# Usage: terraform apply -var-file="production.tfvars"
+# NEVER commit this file — it contains secrets
+# ============================================================
+
+aws_region    = "us-east-1"
+environment   = "production"
+stack_name    = "mythicforge"
+
+# Secrets — generate with: openssl rand -hex 32
+jwt_secret  = "REPLACE_ME_openssl_rand_hex_32"
+db_password = "REPLACE_ME_strong_password_16_chars"
+
+# Optional custom domain
+domain_name     = ""   # e.g. "vtt.yourgame.com"
+certificate_arn = ""   # e.g. "arn:aws:acm:us-east-1:123456:certificate/abc"
+
+# Resources
+task_cpu    = 512     # 0.5 vCPU
+task_memory = 1024    # 1 GB
+desired_count = 1
+
+db_instance_class         = "db.t4g.micro"
+enable_multi_az           = false
+enable_deletion_protection = false
+
+log_retention_days = 30
+max_upload_mb      = 50

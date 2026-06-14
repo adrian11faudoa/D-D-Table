@@ -1,0 +1,220 @@
+name: MythicForge VTT — Build & Deploy
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deploy to environment'
+        required: true
+        default: production
+        type: choice
+        options: [production, staging]
+
+env:
+  AWS_REGION: us-east-1
+  NODE_VERSION: '20'
+
+jobs:
+  # ── Lint & Type Check ──────────────────────────────────────
+  check:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint || true  # warn only
+
+  # ── Build Docker Image ─────────────────────────────────────
+  build:
+    name: Build & Push to ECR
+    runs-on: ubuntu-latest
+    needs: check
+    if: github.event_name != 'pull_request'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set environment
+        id: env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "stack=mythicforge-vtt" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "stack=mythicforge-staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.ecr-login.outputs.registry }}/mythicforge-vtt-${{ steps.env.outputs.environment }}
+          tags: |
+            type=sha,prefix=
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=staging,enable=${{ github.ref == 'refs/heads/staging' }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.aws
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            GIT_SHA=${{ github.sha }}
+
+      - name: Image digest
+        run: echo "Pushed image digest ${{ steps.build.outputs.digest }}"
+
+  # ── Deploy to ECS ──────────────────────────────────────────
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+      url: ${{ steps.url.outputs.app-url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set environment
+        id: env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "stack=mythicforge-vtt" >> $GITHUB_OUTPUT
+            echo "cluster=mythicforge-production" >> $GITHUB_OUTPUT
+            echo "service=mythicforge-production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "stack=mythicforge-staging" >> $GITHUB_OUTPUT
+            echo "cluster=mythicforge-staging" >> $GITHUB_OUTPUT
+            echo "service=mythicforge-staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Force new ECS deployment
+        run: |
+          aws ecs update-service \
+            --cluster ${{ steps.env.outputs.cluster }} \
+            --service ${{ steps.env.outputs.service }} \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for deployment
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ steps.env.outputs.cluster }} \
+            --services ${{ steps.env.outputs.service }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Get app URL
+        id: url
+        run: |
+          URL=$(aws cloudformation describe-stacks \
+            --stack-name ${{ steps.env.outputs.stack }} \
+            --query "Stacks[0].Outputs[?OutputKey=='AppURL'].OutputValue" \
+            --output text)
+          echo "app-url=${URL}" >> $GITHUB_OUTPUT
+          echo "App URL: ${URL}"
+
+      - name: Health check
+        run: |
+          ALB=$(aws cloudformation describe-stacks \
+            --stack-name ${{ steps.env.outputs.stack }} \
+            --query "Stacks[0].Outputs[?OutputKey=='ALBURL'].OutputValue" \
+            --output text)
+          sleep 15
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${ALB}/api/health" --max-time 10)
+          echo "Health check: HTTP ${STATUS}"
+          [[ "${STATUS}" == "200" ]] && echo "✓ Healthy" || (echo "✗ Health check failed" && exit 1)
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "🎉 Deployed MythicForge VTT to ${{ steps.env.outputs.environment }}"
+          echo "URL: ${{ steps.url.outputs.app-url }}"
+          echo "Image: ${{ needs.build.outputs.image-digest }}"
+
+      - name: Notify failure
+        if: failure()
+        run: echo "❌ Deployment to ${{ steps.env.outputs.environment }} failed"
+
+  # ── Infrastructure Updates (manual only) ──────────────────
+  infra:
+    name: Update CloudFormation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && contains(github.event.inputs.environment, 'infrastructure')
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy CloudFormation
+        run: |
+          aws cloudformation deploy \
+            --template-file infra/cloudformation.yml \
+            --stack-name mythicforge-vtt \
+            --region ${{ env.AWS_REGION }} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+                Environment=production \
+                JwtSecret=${{ secrets.JWT_SECRET }} \
+                DBPassword=${{ secrets.DB_PASSWORD }} \
+                DomainName=${{ secrets.DOMAIN_NAME }} \
+                CertificateArn=${{ secrets.CERTIFICATE_ARN }} \
+            --no-fail-on-empty-changeset

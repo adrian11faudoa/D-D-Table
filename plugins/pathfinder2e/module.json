@@ -1,0 +1,15 @@
+{
+  "id": "pathfinder2e",
+  "title": "Pathfinder 2nd Edition",
+  "description": "The Pathfinder 2e game system for MythicForge VTT. Includes proficiency ranks, four-degree success, conditions, and action economy.",
+  "version": "0.1.0",
+  "author": "MythicForge Team",
+  "license": "MIT",
+  "compatibility": { "minimum": "0.1.0", "verified": "0.1.0" },
+  "esmodules": ["dist/index.js"],
+  "type": "system",
+  "packs": [
+    { "id": "pf2e.ancestries", "name": "ancestries", "label": "Ancestries", "type": "Item", "path": "packs/ancestries.db" },
+    { "id": "pf2e.spells",     "name": "spells",     "label": "Spells",     "type": "Item", "path": "packs/spells.db"     }
+  ]
+}

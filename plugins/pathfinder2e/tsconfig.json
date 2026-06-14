@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@mythicforge/shared": ["../../packages/shared/src/index.ts"],
+      "@mythicforge/plugin-api": ["../../packages/plugin-api/src/index.ts"],
+      "@mythicforge/dice-engine": ["../../packages/dice-engine/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules","dist"]
+}
